@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// --- Auth -------------------------------------------------------------
+
+model User {
+  id           String   @id @default(cuid())
+  fullName     String
+  email        String   @unique
+  passwordHash String
+  role         String // regional_director | school_admin | donor
+  createdAt    DateTime @default(now())
+}
+
+// --- Primary PBL data ---------------------------------------------------
+
+model SchoolResponse {
+  id                String   @id @default(cuid())
+  reportingMonth    String // "2025-07"
+  timestamp         DateTime
+  schoolName        String
+  schoolCode        String
+  district          String
+  block             String
+  pblConducted      Boolean
+  evidenceSubmitted Boolean
+  classesRaw        String
+  subjectsRaw       String
+
+  class6Enrollment Int
+  class6Science    Int
+  class6Math       Int
+  class7Enrollment Int
+  class7Science    Int
+  class7Math       Int
+  class8Enrollment Int
+  class8Science    Int
+  class8Math       Int
+
+  totalEnrollment Int
+  totalAttendance Int
+  attendanceRate  Float
+  riskStatusSource String
+
+  classSubjectMetrics ClassSubjectMetric[]
+
+  @@unique([schoolCode, reportingMonth])
+  @@index([reportingMonth, district, block])
+}
+
+// One row per (school, month, grade, subject) that was actually taught.
+// Derived at seed time from the wide SchoolResponse columns so grade/subject
+// filters can query this table directly instead of parsing wide columns.
+model ClassSubjectMetric {
+  id               String  @id @default(cuid())
+  schoolResponseId String
+  schoolResponse   SchoolResponse @relation(fields: [schoolResponseId], references: [id])
+
+  reportingMonth String
+  district       String
+  block          String
+  grade          Int // 6, 7, 8
+  subject        String // "Science" | "Math"
+  enrollment     Int
+  attendance     Int
+  attendanceRate Float
+
+  @@index([reportingMonth, district, block, grade, subject])
+}
+
+// --- Grant reporting evidence --------------------------------------------
+
+model GrantFinanceLine {
+  id                        String @id @default(cuid())
+  grantId                   String
+  donor                     String
+  grantName                 String
+  periodStart               String
+  periodEnd                 String
+  coveredDistricts          String
+  reportingMonth            String
+  budgetLine                String
+  approvedBudgetUnits       Int
+  monthlyUtilizedUnits      Int
+  cumulativeUtilizedUnits   Int
+  cumulativeUtilizationRate Float
+  financeNote               String
+
+  @@index([grantId, reportingMonth])
+}
+
+model GrantPerformance {
+  id                    String @id @default(cuid())
+  grantId               String
+  donor                 String
+  grantName             String
+  reportingMonth        String
+  periodEndDate         String
+  reportDueDate         String
+  reportStatus          String
+  coveredDistricts      String
+  sampledSchoolRecords  Int
+  schoolsCompletedPbl   Int
+  pblCompletionRate     Float
+  schoolsWithEvidence   Int
+  evidenceSubmissionRate Float
+  totalEnrollment       Int
+  totalAttendance       Int
+  attendanceRate        Float
+  riskStatus            String
+  milestoneSummary      String
+  draftReportText       String
+
+  @@unique([grantId, reportingMonth])
+}
+
+model EvidenceMedia {
+  id                String @id @default(cuid())
+  recordId          String @unique
+  recordType        String
+  grantId           String
+  donor             String
+  reportingMonth    String
+  district          String
+  title             String
+  summaryOrCaption  String
+  fileName          String
+  relativePath      String
+  usageNote         String
+
+  @@index([grantId, reportingMonth])
+}

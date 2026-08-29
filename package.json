@@ -1,0 +1,40 @@
+{
+  "name": "pbl-program-intelligence",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "postinstall": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx scripts/seed.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.122.0",
+    "@auth/prisma-adapter": "^2.11.3",
+    "@prisma/client": "5.22.0",
+    "bcryptjs": "^3.0.3",
+    "csv-parse": "^7.0.2",
+    "next": "14.2.35",
+    "next-auth": "^5.0.0-beta.32",
+    "prisma": "5.22.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "recharts": "^3.10.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.11",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "dotenv": "^17.4.2",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "tsx": "^4.23.12",
+    "typescript": "^5"
+  }
+}
