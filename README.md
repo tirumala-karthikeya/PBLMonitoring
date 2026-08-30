@@ -4,15 +4,19 @@ A working prototype for Mantra4Change's Lead Full-Stack Product Developer assess
 
 All data in this repository is synthetic and for assessment use only (see `00_START_HERE.pdf`).
 
+**Live demo**: https://pbl-program-intelligence-blush.vercel.app (deployed on Vercel, backed by a hosted Postgres database on Neon)
+
 ## Setup
 
 ```bash
 npm install                 # also runs `prisma generate` via postinstall
-cp .env.example .env        # DATABASE_URL is pre-set; AUTH_SECRET is required
-npm run db:migrate           # creates prisma/dev.db and applies the schema
+cp .env.example .env        # fill in DATABASE_URL / DIRECT_URL (see below); AUTH_SECRET is required
+npm run db:migrate           # applies the schema to your database
 npm run db:seed              # parses the CSVs and images into the database
 npm run dev                  # http://localhost:3000 (or next free port)
 ```
+
+`DATABASE_URL` points at a PostgreSQL database (this project uses a free [Neon](https://neon.tech) instance for the live demo). Use Neon's **pooled** connection string with `&pgbouncer=true` appended for `DATABASE_URL`, and its **direct** (non-pooled) connection string for `DIRECT_URL`, since Prisma's migration commands need a direct connection while the app's runtime queries need the pooled one. Any Postgres provider works the same way (Supabase, Vercel Postgres, RDS, etc.); SQLite also still works for pure local-only development by switching `provider` back to `"sqlite"` in `prisma/schema.prisma` and dropping `directUrl`.
 
 Then open the app, click **Create one** on the sign-in page, and register an account. There is no seeded user, so the app has no real users until you sign up.
 
@@ -21,7 +25,7 @@ To enable real AI narrative generation, set `ANTHROPIC_API_KEY` in `.env` and re
 ## Architecture
 
 - **Framework**: Next.js 14 (App Router), TypeScript, Tailwind CSS.
-- **Database**: SQLite via Prisma ORM (`prisma/schema.prisma`, `prisma/dev.db`). Chosen for zero-setup local development; see Production Readiness below for the migration path.
+- **Database**: PostgreSQL via Prisma ORM (`prisma/schema.prisma`), hosted on Neon for the live demo. The schema and queries are provider-agnostic, so this was originally built against SQLite for zero-setup local development and swapped over with a single `datasource` change plus a fresh migration; either works.
 - **Auth**: Auth.js (NextAuth v5) with a Credentials provider, bcrypt-hashed passwords, and JWT sessions. Middleware (`middleware.ts`) gates `/dashboard`, `/reports`, `/schools`, `/settings`; each API route also calls `requireSession()` independently, since the middleware matcher only covers page routes, not `/api/*`.
 - **AI**: `@anthropic-ai/sdk`, called only with a small structured "facts" object, never raw CSV rows or database rows. See AI Workflow below.
 - **UI design system**: ported directly from Figma-exported mockups the candidate was given mid-assignment (Sign Up, Sign In, Dashboard, Grant Reporting, Settings), a Material-3-style Tailwind token set (`tailwind.config.ts`): color roles, a fixed type scale, and consistent spacing/radius tokens, shared across every page via `components/AppShell.tsx`.
@@ -78,7 +82,7 @@ To verify the guardrail live: leave `ANTHROPIC_API_KEY` unset (the default in `.
 
 ## Limitations & Production Readiness
 
-- **Database**: SQLite is file-based and single-writer, fine for a local demo but not for concurrent production traffic. Prisma's schema/queries are already provider-agnostic; moving to Postgres (Supabase or otherwise) is a `datasource` provider swap plus a fresh migration, no application code changes.
+- **Database**: now a hosted Postgres instance (Neon), not SQLite, specifically so the app could deploy to Vercel; Vercel's serverless functions have an ephemeral, non-shared filesystem, so a file-based SQLite database can't reliably persist writes there. Uses Neon's pooled connection (`pgbouncer=true`) for app queries and a direct connection for migrations, per Prisma's recommended setup for PgBouncer-fronted Postgres. The Neon free tier's compute auto-suspends when idle, so the first request after a period of inactivity has a few seconds of cold-start latency; warm requests are consistently fast (roughly 1-3s per action, verified against the live deployment).
 - **Auth**: see Assumption #5 above. Add email verification, password reset, and rate-limiting on `/api/auth/*` before any real deployment.
 - **No caching layer**: every dashboard filter change re-queries and re-aggregates in Node from scratch. At this data volume (6,900 school-month rows) it's fast enough not to matter; at real scale, pre-aggregated rollup tables (by district/block/month) would replace the current in-memory `reduce` in `lib/metrics.ts`.
 - **AI cost/latency**: narrative generation is user-triggered, not cached, so repeated clicks re-call the API. A production version would cache a narrative per (grant, month) or (scope, month) until the underlying facts change.
