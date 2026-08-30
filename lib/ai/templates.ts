@@ -6,7 +6,7 @@ function pct(n: number): string {
 }
 
 /**
- * Deterministic, template-based narrative — no AI involved. Used whenever
+ * Deterministic, template-based narrative, no AI involved. Used whenever
  * ANTHROPIC_API_KEY is unset or the API call fails, and mirrors the style
  * of the draft_report_text examples already present in the source CSVs.
  */
@@ -32,7 +32,7 @@ export function buildGrantReportTemplate(facts: GrantReportFacts): string {
   }
   if (facts.riskStatus === "At Risk" || facts.riskStatus === "Critical") {
     sentences.push(
-      `This grant needs follow-up this month — use the district and block dashboards to identify priority intervention areas.`,
+      `This grant needs follow-up this month. Use the district and block dashboards to identify priority intervention areas.`,
     );
   }
 

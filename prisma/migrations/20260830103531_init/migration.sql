@@ -1,18 +1,19 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "fullName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
-    "role" TEXT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "SchoolResponse" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "reportingMonth" TEXT NOT NULL,
-    "timestamp" DATETIME NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL,
     "schoolName" TEXT NOT NULL,
     "schoolCode" TEXT NOT NULL,
     "district" TEXT NOT NULL,
@@ -32,13 +33,15 @@ CREATE TABLE "SchoolResponse" (
     "class8Math" INTEGER NOT NULL,
     "totalEnrollment" INTEGER NOT NULL,
     "totalAttendance" INTEGER NOT NULL,
-    "attendanceRate" REAL NOT NULL,
-    "riskStatusSource" TEXT NOT NULL
+    "attendanceRate" DOUBLE PRECISION NOT NULL,
+    "riskStatusSource" TEXT NOT NULL,
+
+    CONSTRAINT "SchoolResponse_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ClassSubjectMetric" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "schoolResponseId" TEXT NOT NULL,
     "reportingMonth" TEXT NOT NULL,
     "district" TEXT NOT NULL,
@@ -47,13 +50,14 @@ CREATE TABLE "ClassSubjectMetric" (
     "subject" TEXT NOT NULL,
     "enrollment" INTEGER NOT NULL,
     "attendance" INTEGER NOT NULL,
-    "attendanceRate" REAL NOT NULL,
-    CONSTRAINT "ClassSubjectMetric_schoolResponseId_fkey" FOREIGN KEY ("schoolResponseId") REFERENCES "SchoolResponse" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "attendanceRate" DOUBLE PRECISION NOT NULL,
+
+    CONSTRAINT "ClassSubjectMetric_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "GrantFinanceLine" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "grantId" TEXT NOT NULL,
     "donor" TEXT NOT NULL,
     "grantName" TEXT NOT NULL,
@@ -65,13 +69,15 @@ CREATE TABLE "GrantFinanceLine" (
     "approvedBudgetUnits" INTEGER NOT NULL,
     "monthlyUtilizedUnits" INTEGER NOT NULL,
     "cumulativeUtilizedUnits" INTEGER NOT NULL,
-    "cumulativeUtilizationRate" REAL NOT NULL,
-    "financeNote" TEXT NOT NULL
+    "cumulativeUtilizationRate" DOUBLE PRECISION NOT NULL,
+    "financeNote" TEXT NOT NULL,
+
+    CONSTRAINT "GrantFinanceLine_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "GrantPerformance" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "grantId" TEXT NOT NULL,
     "donor" TEXT NOT NULL,
     "grantName" TEXT NOT NULL,
@@ -82,20 +88,22 @@ CREATE TABLE "GrantPerformance" (
     "coveredDistricts" TEXT NOT NULL,
     "sampledSchoolRecords" INTEGER NOT NULL,
     "schoolsCompletedPbl" INTEGER NOT NULL,
-    "pblCompletionRate" REAL NOT NULL,
+    "pblCompletionRate" DOUBLE PRECISION NOT NULL,
     "schoolsWithEvidence" INTEGER NOT NULL,
-    "evidenceSubmissionRate" REAL NOT NULL,
+    "evidenceSubmissionRate" DOUBLE PRECISION NOT NULL,
     "totalEnrollment" INTEGER NOT NULL,
     "totalAttendance" INTEGER NOT NULL,
-    "attendanceRate" REAL NOT NULL,
+    "attendanceRate" DOUBLE PRECISION NOT NULL,
     "riskStatus" TEXT NOT NULL,
     "milestoneSummary" TEXT NOT NULL,
-    "draftReportText" TEXT NOT NULL
+    "draftReportText" TEXT NOT NULL,
+
+    CONSTRAINT "GrantPerformance_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "EvidenceMedia" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "recordId" TEXT NOT NULL,
     "recordType" TEXT NOT NULL,
     "grantId" TEXT NOT NULL,
@@ -106,7 +114,9 @@ CREATE TABLE "EvidenceMedia" (
     "summaryOrCaption" TEXT NOT NULL,
     "fileName" TEXT NOT NULL,
     "relativePath" TEXT NOT NULL,
-    "usageNote" TEXT NOT NULL
+    "usageNote" TEXT NOT NULL,
+
+    CONSTRAINT "EvidenceMedia_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -119,7 +129,7 @@ CREATE INDEX "SchoolResponse_reportingMonth_district_block_idx" ON "SchoolRespon
 CREATE UNIQUE INDEX "SchoolResponse_schoolCode_reportingMonth_key" ON "SchoolResponse"("schoolCode", "reportingMonth");
 
 -- CreateIndex
-CREATE INDEX "ClassSubjectMetric_reportingMonth_district_block_grade_subject_idx" ON "ClassSubjectMetric"("reportingMonth", "district", "block", "grade", "subject");
+CREATE INDEX "ClassSubjectMetric_reportingMonth_district_block_grade_subj_idx" ON "ClassSubjectMetric"("reportingMonth", "district", "block", "grade", "subject");
 
 -- CreateIndex
 CREATE INDEX "GrantFinanceLine_grantId_reportingMonth_idx" ON "GrantFinanceLine"("grantId", "reportingMonth");
@@ -132,3 +142,6 @@ CREATE UNIQUE INDEX "EvidenceMedia_recordId_key" ON "EvidenceMedia"("recordId");
 
 -- CreateIndex
 CREATE INDEX "EvidenceMedia_grantId_reportingMonth_idx" ON "EvidenceMedia"("grantId", "reportingMonth");
+
+-- AddForeignKey
+ALTER TABLE "ClassSubjectMetric" ADD CONSTRAINT "ClassSubjectMetric_schoolResponseId_fkey" FOREIGN KEY ("schoolResponseId") REFERENCES "SchoolResponse"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

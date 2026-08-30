@@ -1,7 +1,7 @@
 export type RiskStatus = "On Track" | "Behind" | "At Risk" | "Critical";
 
 /**
- * Code-based thresholds from the assignment brief — no AI involved.
+ * Code-based thresholds from the assignment brief, no AI involved.
  * On Track >= 75%, Behind 60–<75%, At Risk 35–<60%, Critical < 35%.
  */
 export function classifyRate(ratePercent: number): RiskStatus {

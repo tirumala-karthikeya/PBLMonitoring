@@ -63,13 +63,13 @@ export function computeParticipationAndEvidence(
  *
  * - totalEnrollment ("headcount"): deduped by (school, grade), since a
  *   grade's enrollment is the same number whether one or two subjects
- *   were taught there — summing raw rows would double-count it.
+ *   were taught there (summing raw rows would double-count it).
  * - attendanceRate: attendance summed over all matching rows, divided by
  *   enrollment summed over the SAME (un-deduped) rows. This reproduces the
  *   source CSV's own "Derived: Overall PBL attendance rate" methodology
  *   exactly (verified against School AAKD, July 2025: 133 / (94*2) =
  *   0.7074), without needing to special-case how many subjects a school
- *   taught — a school that only taught one subject simply has one row.
+ *   taught. A school that only taught one subject simply has one row.
  */
 export function computeAttendanceAggregate(
   rows: ClassSubjectRow[],
@@ -194,12 +194,12 @@ export function buildReviewSummaryFacts(params: {
   const discussionPoints: string[] = [];
   if (priorityGeographies.length > 0) {
     discussionPoints.push(
-      `Follow up on ${priorityGeographies.map((g) => g.name).join(", ")} — attendance below the rest of the cohort this month.`,
+      `Follow up on ${priorityGeographies.map((g) => g.name).join(", ")}: attendance below the rest of the cohort this month.`,
     );
   }
   if (metrics.evidenceSubmissionRate < metrics.participationRate - 10) {
     discussionPoints.push(
-      "Evidence submission is trailing participation — schools are running PBL sessions but not documenting them.",
+      "Evidence submission is trailing participation: schools are running PBL sessions but not documenting them.",
     );
   }
   const attendanceDelta = momDeltas.find((m) => m.metric === "attendanceRate");

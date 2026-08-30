@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { Prisma, SchoolResponse } from "@prisma/client";
 import type { ClassSubjectRow, SchoolLevelRow } from "@/lib/metrics";
+import { classifyRate } from "@/lib/risk";
 
 export interface ProgramFilters {
   month?: string;
@@ -73,4 +74,50 @@ export function previousReportingMonth(month: string, allMonths: string[]): stri
   const idx = allMonths.indexOf(month);
   if (idx <= 0) return null;
   return allMonths[idx - 1];
+}
+
+/**
+ * A single school's 3-month history, plus district-level evidence.
+ * The source evidence/media data links each record to a grant + district +
+ * month, not to an individual school (there's no school-level field in
+ * that dataset), so this surfaces district evidence, clearly labeled.
+ */
+export async function getSchoolDetail(schoolCode: string) {
+  const rows = await prisma.schoolResponse.findMany({
+    where: { schoolCode },
+    orderBy: { reportingMonth: "asc" },
+  });
+  if (rows.length === 0) return null;
+
+  const { schoolName, district, block } = rows[0];
+
+  const history = rows.map((r) => ({
+    reportingMonth: r.reportingMonth,
+    pblConducted: r.pblConducted,
+    evidenceSubmitted: r.evidenceSubmitted,
+    totalEnrollment: r.totalEnrollment,
+    totalAttendance: r.totalAttendance,
+    attendanceRate: r.attendanceRate * 100,
+    risk: classifyRate(r.attendanceRate * 100),
+  }));
+
+  const districtEvidenceRows = await prisma.evidenceMedia.findMany({
+    where: { district },
+    orderBy: { reportingMonth: "desc" },
+  });
+
+  return {
+    school: { schoolCode, schoolName, district, block },
+    history,
+    districtEvidence: districtEvidenceRows.map((e) => ({
+      recordId: e.recordId,
+      title: e.title,
+      summaryOrCaption: e.summaryOrCaption,
+      reportingMonth: e.reportingMonth,
+      grantId: e.grantId,
+      donor: e.donor,
+      imageUrl: `/evidence/${e.fileName}`,
+      usageNote: e.usageNote,
+    })),
+  };
 }

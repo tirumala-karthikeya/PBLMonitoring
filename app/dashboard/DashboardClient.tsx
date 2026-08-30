@@ -290,7 +290,7 @@ export default function DashboardClient() {
               <div className="flex-1 overflow-auto p-stack-sm">
                 {attentionList.length === 0 ? (
                   <p className="text-body-md font-body-md text-on-surface-variant p-stack-sm">
-                    No blocks at risk for this filter — nice work.
+                    No blocks at risk for this filter. Nice work.
                   </p>
                 ) : (
                   <div className="flex flex-col gap-2">
@@ -362,7 +362,7 @@ export default function DashboardClient() {
                     <ul className="list-disc list-inside">
                       {summary.facts.priorityGeographies.map((g) => (
                         <li key={g.name}>
-                          {g.name} — {g.attendanceRate.toFixed(1)}% attendance ({g.risk})
+                          {g.name}: {g.attendanceRate.toFixed(1)}% attendance ({g.risk})
                         </li>
                       ))}
                     </ul>

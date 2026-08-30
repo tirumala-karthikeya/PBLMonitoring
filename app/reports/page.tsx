@@ -10,7 +10,7 @@ export default async function ReportsPage() {
   return (
     <AppShell
       pageTitle="Grant Reporting Assistant"
-      user={{ fullName: session.user.name ?? "User", email: session.user.email ?? "", role: session.user.role }}
+      user={{ fullName: session.user.name ?? "User", email: session.user.email ?? "" }}
     >
       <ReportsClient />
     </AppShell>

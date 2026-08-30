@@ -203,6 +203,61 @@ export default function ReportsClient() {
 
                 <div>
                   <h4 className="text-headline-md font-headline-md font-semibold text-on-surface mb-stack-sm flex items-center gap-2">
+                    <span className="material-symbols-outlined text-outline">account_balance_wallet</span>
+                    Budget Line Breakdown
+                  </h4>
+                  <div className="border border-outline-variant rounded-DEFAULT overflow-hidden">
+                    <table className="w-full text-left border-collapse">
+                      <thead className="bg-surface-container-low">
+                        <tr>
+                          <th className="p-stack-sm pl-stack-md text-label-md font-label-md text-outline uppercase border-b border-outline-variant">
+                            Budget Line
+                          </th>
+                          <th className="p-stack-sm text-label-md font-label-md text-outline uppercase border-b border-outline-variant text-right">
+                            Approved
+                          </th>
+                          <th className="p-stack-sm text-label-md font-label-md text-outline uppercase border-b border-outline-variant text-right">
+                            Utilized
+                          </th>
+                          <th className="p-stack-sm pr-stack-md text-label-md font-label-md text-outline uppercase border-b border-outline-variant w-40">
+                            Utilization
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {facts.financeLines.map((line) => (
+                          <tr key={line.budgetLine} className="border-b border-outline-variant last:border-b-0">
+                            <td className="p-stack-sm pl-stack-md text-body-md font-body-md font-medium text-on-surface">
+                              {line.budgetLine}
+                            </td>
+                            <td className="p-stack-sm text-data-mono font-data-mono text-on-surface text-right">
+                              {line.approvedBudgetUnits.toLocaleString()}
+                            </td>
+                            <td className="p-stack-sm text-data-mono font-data-mono text-on-surface text-right">
+                              {line.cumulativeUtilizedUnits.toLocaleString()}
+                            </td>
+                            <td className="p-stack-sm pr-stack-md">
+                              <div className="flex items-center gap-2">
+                                <div className="flex-1 h-1.5 bg-surface-variant rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-primary-container rounded-full"
+                                    style={{ width: `${Math.min(line.cumulativeUtilizationRate, 100)}%` }}
+                                  />
+                                </div>
+                                <span className="text-data-mono font-data-mono text-on-surface w-12 text-right shrink-0">
+                                  {pct(line.cumulativeUtilizationRate)}
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-headline-md font-headline-md font-semibold text-on-surface mb-stack-sm flex items-center gap-2">
                     <span className="material-symbols-outlined text-outline">flag</span>
                     Milestones
                   </h4>

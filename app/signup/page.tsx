@@ -5,17 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 
-const ROLES = [
-  { value: "regional_director", label: "Regional Director" },
-  { value: "school_admin", label: "School Admin" },
-  { value: "donor", label: "Donor" },
-];
-
 export default function SignUpPage() {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -28,7 +21,7 @@ export default function SignUpPage() {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName, email, role, password }),
+        body: JSON.stringify({ fullName, email, password }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -136,34 +129,6 @@ export default function SignUpPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-            </div>
-
-            <div className="flex flex-col gap-base">
-              <label className="font-label-md text-label-md text-on-surface-variant" htmlFor="role">
-                System Role
-              </label>
-              <div className="relative">
-                <select
-                  className="w-full appearance-none font-body-md text-body-md text-on-surface bg-surface-container-lowest border border-outline-variant rounded-DEFAULT px-stack-md py-[10px] focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/10 transition-colors cursor-pointer pr-10"
-                  id="role"
-                  name="role"
-                  required
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                >
-                  <option className="text-outline-variant" disabled value="">
-                    Select your role
-                  </option>
-                  {ROLES.map((r) => (
-                    <option key={r.value} value={r.value}>
-                      {r.label}
-                    </option>
-                  ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-stack-md text-outline">
-                  <span className="material-symbols-outlined text-[20px]">expand_more</span>
-                </div>
-              </div>
             </div>
 
             <div className="flex flex-col gap-base">

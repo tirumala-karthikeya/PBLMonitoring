@@ -5,16 +5,9 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { NAV_ITEMS } from "@/lib/nav-items";
 
-const ROLE_LABELS: Record<string, string> = {
-  regional_director: "Regional Director",
-  school_admin: "School Admin",
-  donor: "Donor",
-};
-
 export type AppShellUser = {
   fullName: string;
   email: string;
-  role: string;
 };
 
 export default function AppShell({
@@ -71,22 +64,26 @@ export default function AppShell({
 
         <div className="px-gutter mt-auto pt-stack-lg border-t border-outline-variant">
           <div className="flex items-center gap-stack-sm">
-            <div className="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden shrink-0 flex items-center justify-center text-on-surface-variant">
-              <span className="material-symbols-outlined text-[18px]">account_circle</span>
-            </div>
-            <div className="truncate flex-1">
-              <p className="text-body-md font-body-md text-on-surface font-semibold truncate">
-                {user.fullName}
-              </p>
-              <p className="text-label-md font-label-md text-on-surface-variant truncate">
-                {ROLE_LABELS[user.role] ?? user.role}
-              </p>
-            </div>
+            <Link
+              href="/settings"
+              title="View profile"
+              className="flex items-center gap-stack-sm flex-1 min-w-0 rounded-DEFAULT hover:bg-surface-container-low transition-colors p-1 -m-1"
+            >
+              <div className="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden shrink-0 flex items-center justify-center text-on-surface-variant">
+                <span className="material-symbols-outlined text-[18px]">account_circle</span>
+              </div>
+              <div className="truncate flex-1">
+                <p className="text-body-md font-body-md text-on-surface font-semibold truncate">
+                  {user.fullName}
+                </p>
+                <p className="text-label-md font-label-md text-on-surface-variant truncate">{user.email}</p>
+              </div>
+            </Link>
             <button
               onClick={() => signOut({ callbackUrl: "/signin" })}
               aria-label="Sign out"
               title="Sign out"
-              className="p-1.5 rounded-DEFAULT text-on-surface-variant hover:text-error hover:bg-error-container transition-colors"
+              className="p-1.5 rounded-DEFAULT text-on-surface-variant hover:text-error hover:bg-error-container transition-colors shrink-0"
             >
               <span className="material-symbols-outlined text-[18px]">logout</span>
             </button>
@@ -100,12 +97,20 @@ export default function AppShell({
         <header className="sticky top-0 bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center h-16 px-container-margin z-10 w-full shrink-0">
           <h2 className="text-headline-md font-headline-md font-bold text-primary">{pageTitle}</h2>
           <div className="flex items-center gap-stack-sm text-on-surface-variant">
-            <button className="p-2 hover:text-primary cursor-pointer active:scale-95 transition-transform rounded-full hover:bg-surface-container-low">
+            <button
+              disabled
+              title="No notifications system in this build"
+              className="p-2 rounded-full opacity-40 cursor-not-allowed"
+            >
               <span className="material-symbols-outlined">notifications</span>
             </button>
-            <button className="p-2 hover:text-primary cursor-pointer active:scale-95 transition-transform rounded-full hover:bg-surface-container-low">
+            <Link
+              href="/help"
+              title="Help & Support"
+              className="p-2 hover:text-primary cursor-pointer active:scale-95 transition-transform rounded-full hover:bg-surface-container-low"
+            >
               <span className="material-symbols-outlined">help</span>
-            </button>
+            </Link>
           </div>
         </header>
 

@@ -10,7 +10,7 @@ export default async function SchoolsPage() {
   return (
     <AppShell
       pageTitle="Schools"
-      user={{ fullName: session.user.name ?? "User", email: session.user.email ?? "", role: session.user.role }}
+      user={{ fullName: session.user.name ?? "User", email: session.user.email ?? "" }}
     >
       <SchoolsClient />
     </AppShell>

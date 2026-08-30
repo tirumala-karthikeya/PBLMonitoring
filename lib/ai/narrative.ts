@@ -12,12 +12,13 @@ Rules:
 - Do not round numbers in a way that changes their meaning; you may format them naturally (e.g. "84.2%").
 - Write 3-5 sentences of plain, report-ready prose. No headings, no bullet points, no markdown.
 - If the facts indicate risk (At Risk or Critical), say so plainly and note that follow-up is needed.
-- Do not mention that you are an AI or that you were given "facts" — just write the narrative.`;
+- Do not mention that you are an AI or that you were given "facts": just write the narrative.
+- Do not use em dashes; use commas, periods, or parentheses instead.`;
 
 /**
  * Calls Claude with only a structured facts object (never raw CSV rows).
- * Returns null on any failure — missing key, network error, rate limit,
- * or an unexpected response shape — so callers can fall back to the
+ * Returns null on any failure (missing key, network error, rate limit,
+ * or an unexpected response shape) so callers can fall back to the
  * deterministic template generator without the request ever failing.
  */
 async function callClaude(factsJson: unknown): Promise<string | null> {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import FilterSelect from "@/components/FilterSelect";
 import RiskBadge from "@/components/RiskBadge";
 import type { RiskStatus } from "@/lib/risk";
@@ -18,6 +19,7 @@ interface School {
 }
 
 export default function SchoolsClient() {
+  const router = useRouter();
   const [district, setDistrict] = useState("");
   const [block, setBlock] = useState("");
   const [districts, setDistricts] = useState<string[]>([]);
@@ -93,7 +95,11 @@ export default function SchoolsClient() {
                 </tr>
               ) : (
                 schools.map((s) => (
-                  <tr key={s.schoolCode} className="border-b border-outline-variant hover:bg-surface-container-low">
+                  <tr
+                    key={s.schoolCode}
+                    onClick={() => router.push(`/schools/${s.schoolCode}`)}
+                    className="border-b border-outline-variant hover:bg-surface-container-low cursor-pointer"
+                  >
                     <td className="p-stack-sm pl-stack-md text-body-md font-body-md font-medium text-on-surface">
                       {s.schoolName}
                       <span className="block text-label-md font-label-md text-outline">{s.schoolCode}</span>
@@ -106,8 +112,11 @@ export default function SchoolsClient() {
                     <td className="p-stack-sm text-body-md font-body-md text-on-surface-variant">
                       {s.evidenceSubmitted ? "Submitted" : "Missing"}
                     </td>
-                    <td className="p-stack-sm pr-stack-md text-right">
-                      <RiskBadge risk={s.risk} />
+                    <td className="p-stack-sm pr-stack-md">
+                      <div className="flex items-center justify-end gap-2">
+                        <RiskBadge risk={s.risk} />
+                        <span className="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+                      </div>
                     </td>
                   </tr>
                 ))

@@ -2,21 +2,14 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import AppShell from "@/components/AppShell";
 
-const ROLE_LABELS: Record<string, string> = {
-  regional_director: "Regional Director",
-  school_admin: "School Admin",
-  donor: "Donor",
-};
-
 export default async function SettingsPage() {
   const session = await auth();
   if (!session?.user) redirect("/signin");
 
   const user = session.user;
-  const roleLabel = ROLE_LABELS[user.role] ?? user.role;
 
   return (
-    <AppShell pageTitle="Settings" user={{ fullName: user.name ?? "User", email: user.email ?? "", role: user.role }}>
+    <AppShell pageTitle="Settings" user={{ fullName: user.name ?? "User", email: user.email ?? "" }}>
       <div className="space-y-stack-lg pb-stack-lg">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-stack-lg">
           {/* Left: identity card */}
@@ -33,9 +26,9 @@ export default async function SettingsPage() {
                   <div className="w-20 h-20 rounded-full border-4 border-surface-container-lowest bg-surface-container-high flex items-center justify-center text-on-surface-variant shrink-0">
                     <span className="material-symbols-outlined text-[36px]">account_circle</span>
                   </div>
-                  <div>
-                    <h2 className="font-headline-lg text-headline-lg text-on-surface">{user.name}</h2>
-                    <p className="font-body-lg text-body-lg text-outline mt-1">{roleLabel}</p>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="font-headline-lg text-headline-lg text-on-surface truncate">{user.name}</h2>
+                    <p className="font-body-lg text-body-lg text-outline mt-1 truncate">{user.email}</p>
                   </div>
                 </div>
                 <div className="mt-stack-lg flex gap-2">
@@ -54,13 +47,6 @@ export default async function SettingsPage() {
                   <div>
                     <p className="font-label-md text-label-md text-outline uppercase tracking-wider">Email</p>
                     <p className="font-body-md text-body-md text-on-surface">{user.email}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="material-symbols-outlined text-outline">badge</span>
-                  <div>
-                    <p className="font-label-md text-label-md text-outline uppercase tracking-wider">Role</p>
-                    <p className="font-body-md text-body-md text-on-surface">{roleLabel}</p>
                   </div>
                 </div>
               </div>
@@ -85,9 +71,9 @@ export default async function SettingsPage() {
                   </thead>
                   <tbody className="divide-y divide-outline-variant">
                     <tr>
-                      <td className="px-stack-lg py-4 font-data-mono text-data-mono text-on-surface-variant">—</td>
+                      <td className="px-stack-lg py-4 font-data-mono text-data-mono text-on-surface-variant">N/A</td>
                       <td className="px-stack-lg py-4 font-body-md text-body-md text-on-surface-variant italic">
-                        Activity logging is not implemented in this assessment build — this table illustrates the
+                        Activity logging is not implemented in this assessment build. This table illustrates the
                         intended layout only.
                       </td>
                       <td className="px-stack-lg py-4">
